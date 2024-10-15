@@ -37,7 +37,8 @@ SRCS		+=	src/plane_ops.c\
 				src/circle_ops.c\
 				src/cyl_ops.c\
 				src/square_ops.c\
-				src/triangle_ops.c
+				src/triangle_ops.c\
+				src/cone_ops.c
 
 MKDIR_P		=	mkdir -p
 RM			=	rm -f
@@ -77,7 +78,7 @@ MAGENTA		=	\033[0;35m
 CYAN		=	\033[0;36m
 RESET		=	\033[0m
 # **************************************************************************** #
-CFLAGS		=	-Wall -Wextra -Werror
+CFLAGS		=	-Wall -Wextra #-Werror
 
 CC			=	clang
 

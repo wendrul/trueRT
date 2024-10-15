@@ -105,6 +105,7 @@ int		main(int argc, char **argv)
 	add_drawable(&drawables, "cy", create_cyl);
 	add_drawable(&drawables, "sq", create_square);
 	add_drawable(&drawables, "tr", create_triangle);
+	add_drawable(&drawables, "co", create_cone);
 	scene = parse_scene(argv[1], drawables);
 	scene = parse_console_args(scene, argc, argv);
 	if (!scene.save_to_file)

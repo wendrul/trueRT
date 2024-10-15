@@ -35,6 +35,7 @@ t_cyl		create_cyl(t_parse_args parsed);
 t_circle	create_circle(t_parse_args parsed);
 t_square	create_square(t_parse_args parsed);
 t_triangle	create_triangle(t_parse_args parsed);
+t_cone		create_cone(t_parse_args parsed);
 
 t_point		sphere_intersection(t_sphere s, t_vect ray, t_point start);
 t_point		plane_intersection(t_plane p, t_vect ray, t_point start);
@@ -43,6 +44,7 @@ t_point		cyl_intersection(t_cyl c, t_vect ray, t_point start);
 t_point		circle_intersection(t_circle c, t_vect ray, t_point start);
 t_point		square_intersection(t_square s, t_vect ray, t_point start);
 t_point		triangle_intersection(t_triangle t, t_vect ray, t_point start);
+t_point		cone_intersection(t_triangle t, t_vect ray, t_point start);
 
 t_vect		get_sphere_normal_vector(t_vect inter, t_sphere s, t_point start);
 t_vect		get_plane_normal_vector(t_vect inter, t_plane p, t_point start);
@@ -51,6 +53,7 @@ t_vect		get_cyl_normal_vector(t_vect inter, t_figure cyl, t_point start);
 t_vect		get_circle_normal_vector(t_vect inter, t_circle c, t_point start);
 t_vect		get_square_normal_vector(t_vect inter, t_square s, t_point start);
 t_vect		get_triangle_normal_vector(t_vect inter, t_triangle t, t_point st);
+t_vect		get_cone_normal_vector(t_vect inter, t_triangle t, t_point st);
 
 void		render_frame(t_scene scene);
 t_vect		**init_tracer(t_scene scene);

@@ -129,6 +129,7 @@ typedef struct	s_poubelle
 typedef t_figure	t_hcyl;
 typedef t_figure	t_cyl;
 typedef t_figure	t_sphere;
+typedef t_figure	t_cone;
 typedef t_figure	t_plane;
 typedef t_figure	t_circle;
 typedef t_figure	t_square;
