@@ -63,14 +63,12 @@ static int		get_inter_color(t_scene s, t_inters closest,
 static int		mix_colors(t_scene s, t_inters closest, t_vect start)
 {
 	int		i;
-	int		flag;
 	int		color;
 	t_color total;
 	t_color tmp;
 
 	i = -1;
 	total = new_color(0, 0, 0);
-	flag = 0;
 	while (++i < s.light_count)
 	{
 		color = get_inter_color(s, closest, start, i);

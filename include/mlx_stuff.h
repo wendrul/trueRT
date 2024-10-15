@@ -32,7 +32,7 @@ typedef struct	s_window
 	int			s_l;
 }				t_window;
 
-t_window	g_win;
+extern t_window	g_win;
 
 void			init_win(t_scene scene);
 int				interact(int keycode, void *param);

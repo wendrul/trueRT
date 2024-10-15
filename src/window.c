@@ -12,6 +12,8 @@
 
 #include "minirt.h"
 
+t_window	g_win;
+
 void	init_win(t_scene scene)
 {
 	g_win.win = mlx_new_window(g_win.mlx, scene.resolution.x,
