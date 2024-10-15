@@ -253,7 +253,7 @@ t_cone create_cone(t_parse_args parsed)
     cone.normal.z = parsed.args[5];
     cone.normal = normalize(cone.normal);
     cone.radius = parsed.args[6];
-    cone.height = parsed.args[7];
+    cone.length = parsed.args[7];
     cone.color = rgb_to_int(new_color(parsed.args[8], parsed.args[9], parsed.args[10]));
     cone.is_reflective = 0;
     if (parsed.size > 11)
@@ -271,8 +271,8 @@ t_point cone_intersection(t_cone cone, t_vect r, t_point s)
     t_vect v2;
     float k;
 
-    // k is the slope of the cone, relating height and radius
-    k = cone.radius / cone.height;
+    // k is the slope of the cone, relating length and radius
+    k = cone.radius / cone.length;
 
     // Cone intersection calculation
     v1 = subtract(r, scale(cone.normal, dot(r, cone.normal)));
@@ -297,7 +297,7 @@ t_point solve_cone_equa(t_polynome equa, t_figure cone, t_vect r, t_vect s)
         {
             result = new_vect(s.x + t * r.x, s.y + t * r.y, s.z + t * r.z);
             t = dot(subtract(result, cone.center), cone.normal);
-            if (t < cone.height && t > 0)
+            if (t < cone.length && t > 0)
                 return (result);
         }
         t = ((-equa.b - equa.sqrt_delta) / (2 * equa.a)) * -1;
@@ -305,7 +305,7 @@ t_point solve_cone_equa(t_polynome equa, t_figure cone, t_vect r, t_vect s)
         {
             result = new_vect(s.x + t * r.x, s.y + t * r.y, s.z + t * r.z);
             t = dot(subtract(result, cone.center), cone.normal);
-            if (t < cone.height && t > 0)
+            if (t < cone.length && t > 0)
                 return (result);
         }
     }
@@ -320,8 +320,8 @@ t_vect get_cone_normal_vector(t_vect inter, t_figure cone, t_point s)
     float height_ratio;
 
     u = subtract(inter, cone.center);
-    height_ratio = dot(u, cone.normal) / cone.height;
-    normal = subtract(u, scale(cone.normal, height_ratio * (1 + cone.radius / cone.height)));
+    height_ratio = dot(u, cone.normal) / cone.length;
+    normal = subtract(u, scale(cone.normal, height_ratio * (1 + cone.radius / cone.length)));
     normal = normalize(normal);
 
     if (dot(subtract(inter, s), normal) < 0)
