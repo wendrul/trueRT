@@ -221,7 +221,7 @@ char *check_cone_args(t_parse_args parsed)
     float args[MAX_PARSE_FIGURE_ARGUMENTS];
 
     ft_memcpy(args, parsed.args, parsed.size * sizeof(float));
-    if (parsed.size < 11)
+    if (parsed.size < 10)
         return ("Not enough arguments for a cone.");
     if (args[3] > 1 || args[4] > 1 || args[5] > 1 ||
         args[3] < -1 || args[4] < -1 || args[5] < -1)
@@ -264,69 +264,116 @@ t_cone create_cone(t_parse_args parsed)
     return (cone);
 }
 
-t_point cone_intersection(t_cone cone, t_vect r, t_point s)
+
+t_point		solve_equa_cone(t_polynome equa, t_vect ray, t_vect start)
 {
+	float	t;
+
+	t_vect result = new_vect(RENDER_DISTANCE, RENDER_DISTANCE, RENDER_DISTANCE);
+	if ((equa.delta = equa.b * equa.b - 4 * equa.a * equa.c) > 0)
+	{
+		equa.sqrt_delta = sqrt(equa.delta);
+		t = ((-equa.b + equa.sqrt_delta) / (2 * equa.a)) * -1;
+		if (t > 0)
+		{
+			result = new_vect(start.x + t * ray.x, start.y + t * ray.y,
+							start.z + t * ray.z);
+			return (result);
+		}
+		t = ((-equa.b - equa.sqrt_delta) / (2 * equa.a)) * -1;
+		if (t > 0)
+		{
+			result = new_vect(start.x + t * ray.x, start.y + t * ray.y,
+							start.z + t * ray.z);
+			return (result);
+		}
+	}
+	result = new_vect(RENDER_DISTANCE, RENDER_DISTANCE, RENDER_DISTANCE);
+	return (result);
+}
+
+t_point cone_intersection(t_cone c, t_vect d, t_point o)
+{
+    float dv = dot(d, c.normal);
+    float cos_theta2 = cos(c.radius);
+    cos_theta2 = cos_theta2 * cos_theta2;
+    t_vect co = subtract(o, c.center);
+    float co_v = dot(co, c.normal);
+    float d_co = dot(d, co);
+
     t_polynome equa;
-    t_vect v1;
-    t_vect v2;
-    float k;
 
-    // k is the slope of the cone, relating length and radius
-    k = cone.radius / cone.length;
+    equa.a = dv * dv - cos_theta2;
+    equa.b = -2 * (dv * co_v - d_co * cos_theta2);
+    equa.c = co_v * co_v - dot(co, co) * cos_theta2;
+    t_point p = solve_equa_cone(equa, d, o);
 
-    // Cone intersection calculation
-    v1 = subtract(r, scale(cone.normal, dot(r, cone.normal)));
-    v2 = subtract(s, cone.center);
-    equa.a = dot(v1, v1) - (1 + k * k) * pow(dot(r, cone.normal), 2);
-    equa.b = 2 * (dot(v1, v2) - (1 + k * k) * dot(r, cone.normal) * dot(v2, cone.normal));
-    equa.c = dot(v2, v2) - (1 + k * k) * pow(dot(v2, cone.normal), 2);
+    if (p.x < RENDER_DISTANCE - 0.001 && dot(subtract(p, c.center), c.normal) > 0)
+        return p;
 
-    return solve_cone_equa(equa, cone, r, s);
+    return new_vect(RENDER_DISTANCE, RENDER_DISTANCE, RENDER_DISTANCE);
 }
 
-t_point solve_cone_equa(t_polynome equa, t_figure cone, t_vect r, t_vect s)
+
+// t_point cone_intersection(t_cone cone, t_vect r, t_point s)
+// {
+//     t_polynome equa;
+//     t_vect v1;
+//     t_vect v2;
+//     float k;
+//
+//     // k is the slope of the cone, relating length and radius
+//     k = cone.radius / cone.length;
+//
+//     // Cone intersection calculation
+//     v1 = subtract(r, scale(cone.normal, dot(r, cone.normal)));
+//     v2 = subtract(s, cone.center);
+//     equa.a = dot(v1, v1) - (1 + k * k) * pow(dot(r, cone.normal), 2);
+//     equa.b = 2 * (dot(v1, v2) - (1 + k * k) * dot(r, cone.normal) * dot(v2, cone.normal));
+//     equa.c = dot(v2, v2) - (1 + k * k) * pow(dot(v2, cone.normal), 2);
+//
+//     return solve_cone_equa(equa, cone, r, s);
+// }
+
+// t_point solve_cone_equa(t_polynome equa, t_figure cone, t_vect r, t_vect s)
+// {
+//     t_vect result;
+//     float t;
+//
+//     if ((equa.delta = equa.b * equa.b - 4 * equa.a * equa.c) > EPSILON)
+//     {
+//         equa.sqrt_delta = sqrt(equa.delta);
+//         t = ((-equa.b + equa.sqrt_delta) / (2 * equa.a)) * -1;
+//         if (t > 0)
+//         {
+//             result = new_vect(s.x + t * r.x, s.y + t * r.y, s.z + t * r.z);
+//             t = dot(subtract(result, cone.center), cone.normal);
+//             if (t < cone.length && t > 0)
+//                 return (result);
+//         }
+//         t = ((-equa.b - equa.sqrt_delta) / (2 * equa.a)) * -1;
+//         if (t > 0)
+//         {
+//             result = new_vect(s.x + t * r.x, s.y + t * r.y, s.z + t * r.z);
+//             t = dot(subtract(result, cone.center), cone.normal);
+//             if (t < cone.length && t > 0)
+//                 return (result);
+//         }
+//     }
+//     result = new_vect(RENDER_DISTANCE, RENDER_DISTANCE, RENDER_DISTANCE);
+//     return (result);
+// }
+
+t_vect get_cone_normal_vector(t_vect p, t_figure cone, t_point s)
 {
-    t_vect result;
-    float t;
+    float r = sqrt((p.x-cone.center.x)*(p.x-cone.center.x) + (p.z-cone.center.z)*(p.z-cone.center.z));
+    t_vect n = new_vect(p.x-cone.center.x, r*(cone.radius/cone.length), p.z-cone.center.z);
 
-    if ((equa.delta = equa.b * equa.b - 4 * equa.a * equa.c) > EPSILON)
-    {
-        equa.sqrt_delta = sqrt(equa.delta);
-        t = ((-equa.b + equa.sqrt_delta) / (2 * equa.a)) * -1;
-        if (t > 0)
-        {
-            result = new_vect(s.x + t * r.x, s.y + t * r.y, s.z + t * r.z);
-            t = dot(subtract(result, cone.center), cone.normal);
-            if (t < cone.length && t > 0)
-                return (result);
-        }
-        t = ((-equa.b - equa.sqrt_delta) / (2 * equa.a)) * -1;
-        if (t > 0)
-        {
-            result = new_vect(s.x + t * r.x, s.y + t * r.y, s.z + t * r.z);
-            t = dot(subtract(result, cone.center), cone.normal);
-            if (t < cone.length && t > 0)
-                return (result);
-        }
-    }
-    result = new_vect(RENDER_DISTANCE, RENDER_DISTANCE, RENDER_DISTANCE);
-    return (result);
-}
+    n = normalize(n);
 
-t_vect get_cone_normal_vector(t_vect inter, t_figure cone, t_point s)
-{
-    t_vect normal;
-    t_vect u;
-    float height_ratio;
-
-    u = subtract(inter, cone.center);
-    height_ratio = dot(u, cone.normal) / cone.length;
-    normal = subtract(u, scale(cone.normal, height_ratio * (1 + cone.radius / cone.length)));
-    normal = normalize(normal);
-
-    if (dot(subtract(inter, s), normal) < 0)
-        return (normal);
+    if (dot(subtract(p, s), n) < 0)
+        return (n);
     else
-        return (scale(normal, -1));
+        return (scale(n, -1));
 }
 
